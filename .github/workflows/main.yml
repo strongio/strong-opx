@@ -1,0 +1,128 @@
+name: ci
+
+on:
+  pull_request:
+  push:
+    branches:
+      - master
+      - develop
+
+permissions:
+  contents: read
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@0ad4b8fadaa221de15dcec353f45205ec38ea70b # 4.1.4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@82c7e631bb3cdc910f68e0081d67478d79c6982d # 5.1.0
+        with:
+          python-version-file: 'pyproject.toml'
+
+      - name: Install dependencies
+        run: |
+          pip install --upgrade pip
+          pip install isort black
+
+      - name: Lint
+        run: |
+          make lint
+
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [ "3.9", "3.10", "3.11", "3.12" ]
+
+    steps:
+      - uses: actions/checkout@0ad4b8fadaa221de15dcec353f45205ec38ea70b # 4.1.4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@82c7e631bb3cdc910f68e0081d67478d79c6982d # 5.1.0
+        with:
+          cache: 'pip'
+          python-version: ${{ matrix.python-version }}
+          cache-dependency-path: pyproject.toml
+
+      - name: Install dependencies
+        run: |
+          pip install --upgrade pip
+          pip install -e ".[dev]"
+
+      - name: freeze
+        if: always()
+        run: |
+          pip freeze
+
+      - name: Test with pytest
+        run: |
+          make test
+
+  smoke_test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: [ "3.9", "3.10", "3.11", "3.12" ]
+
+    steps:
+      - uses: actions/checkout@0ad4b8fadaa221de15dcec353f45205ec38ea70b # 4.1.4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@82c7e631bb3cdc910f68e0081d67478d79c6982d # 5.1.0
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: pip install package with base requirements
+        run: |
+          pip install .
+
+      - name: freeze after base install
+        if: always()
+        run: |
+          pip freeze
+
+  release:
+    needs: [ lint, test, smoke_test ]
+    concurrency:
+      group: release
+    runs-on: ubuntu-latest
+    environment:
+      name: pypi
+      url: https://pypi.org/p/strong-opx
+    permissions:
+      contents: write # to clone repo
+      id-token: write # to publish to PyPI
+
+    steps:
+      - uses: actions/checkout@0ad4b8fadaa221de15dcec353f45205ec38ea70b # 4.1.4
+        with:
+          fetch-depth: 0
+          ssh-key: ${{ secrets.DEPLOY_KEY }}
+
+      - name: Install Dependencies
+        run: |
+          pip install --upgrade python-semantic-release build twine
+
+      - name: Build package distributions
+        run: |
+          python -m build
+
+      - name: Publish to VCS
+        run: |
+          semantic-release version --push --changelog --commit --vcs-release
+          semantic-release publish
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GIT_COMMIT_AUTHOR: "Strong Analytics <access@strong.io>"
+
+      - name: Publish package distributions to PyPI
+        uses: pypa/gh-action-pypi-publish@76f52bc884231f62b9a034ebfe128415bbaabdfc

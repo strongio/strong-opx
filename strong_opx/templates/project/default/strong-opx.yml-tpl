@@ -1,0 +1,11 @@
+name: '{{ project_name }}'
+dirname: 'ops'
+
+strong_opx:
+  required_version: '>= {{ strong_opx_version }}'
+
+secret:
+  provider: aws_ssm
+  parameter: '{{ project_name }}-{% raw %}{{ ENVIRONMENT }}{% endraw %}'
+
+vars: 'vars/{% raw %}{{ ENVIRONMENT }}{% endraw %}.yml'

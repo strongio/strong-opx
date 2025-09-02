@@ -1,0 +1,88 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "strong-opx"
+description = "Tools for deploying and managing Strong infrastructure"
+readme = "README.md"
+requires-python = ">=3.9"
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Developers",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12"
+]
+license = { file = "LICENSE" }
+authors = [
+    { name = "Strong Analytics", email = "contact@strong.io" }
+]
+dependencies = [
+    "Jinja2",
+    "PyYAML",
+    "ansible",
+    "awscli",
+    "boto3",
+    "colorama",
+    "filelock",
+    "prompt-toolkit>=3.0.39",
+    "pydantic>=2",
+    "tabulate"
+]
+dynamic = ["version"]
+
+[project.urls]
+Homepage = "https://github.com/strongio/strong-opx"
+Issues = "https://github.com/strongio/strong-opx/issues"
+
+[project.optional-dependencies]
+dev = [
+    "moto>=5",
+    "isort",
+    "pytest-tldr",
+    "pytest",
+    "toml",
+    "black",
+    "coverage",
+    "parameterized",
+    "astunparse"
+]
+
+[project.scripts]
+strong-opx = "strong_opx.management.entrypoint:main"
+
+[tool.setuptools.dynamic]
+version = { attr = "strong_opx.__version__" }
+
+[tool.setuptools.packages.find]
+include = ["strong_opx", "strong_opx.*"]
+
+[tool.cibuildwheel]
+build-frontend = "build"
+
+[tool.black]
+line-length = 120
+
+[tool.isort]
+multi_line_output = 3
+include_trailing_comma = true
+force_grid_wrap = 0
+use_parentheses = true
+line_length = 120
+
+[tool.semantic_release]
+version_variables = ["strong_opx/__init__.py:__version__"]
+commit_message = "Bump to {version} [skip ci]"
+
+[tool.semantic_release.publish]
+upload_to_pypi = true
+upload_to_vcs_release = true
+
+[tool.semantic_release.remote]
+ignore_token_for_push = true
+
+[tool.semantic_release.changelog]
+mode = "update"

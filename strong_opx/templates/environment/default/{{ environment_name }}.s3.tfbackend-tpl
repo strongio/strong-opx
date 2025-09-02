@@ -1,0 +1,5 @@
+bucket         = "{{ project.ops_bucket_name }}"
+key            = "{{ environment.name }}.tfstate"
+region         = "{{ aws_region }}"
+encrypt        = true
+dynamodb_table = "{{ environment.dynamodb_table_name }}"

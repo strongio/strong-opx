@@ -1,0 +1,84 @@
+name: 'Setup Strong-Opx'
+description: 'Install and Configure Strong-OpX'
+inputs:
+  version:
+    description: 'Version to install'
+    default: latest
+  python-version:
+    description: 'Python version to use'
+    default: '3.10'
+  project-path:
+    description: 'Project path'
+    required: true
+  ssh-user:
+    description: 'SSH username'
+    default: ''
+  ssh-key:
+    description: 'SSH key'
+    default: ''
+  git-ssh-key:
+    description: 'SSH key to use for pulling source code during deployment'
+    default: ''
+outputs:
+  executable:
+    description: 'strong-opx executable path'
+    value: ${{ steps.path.outputs.executable-path }}
+runs:
+  using: composite
+  steps:
+    - uses: actions/setup-python@v4
+      with:
+        python-version: "${{ inputs.python-version }}"
+
+    - name: cache venv
+      id: cache
+      uses: actions/cache@v3
+      with:
+        path: /opt/strong-opx
+        key: "strong-opx-${{ inputs.version }}"
+
+    - name: create venv
+      if: steps.cache.outputs.cache-hit != 'true'
+      shell: bash
+      run: python -m venv /opt/strong-opx
+
+    - name: set env vars
+      shell: bash
+      run: |
+        source /opt/strong-opx/bin/activate
+        echo "PATH=$PATH" >> $GITHUB_ENV
+
+    - name: install strong-opx
+      shell: bash
+      run: |
+        source /opt/strong-opx/bin/activate
+        python_version=$(echo "cp${{ inputs.python-version }}" | sed 's/\.//g')
+        python -m pip install "strong-opx @ https://s3-us-west-2.amazonaws.com/strong-packages/strong_opx-${{ inputs.version }}-${python_version}-${python_version}-manylinux_2_17_x86_64.manylinux2014_x86_64.whl"
+
+    - name: register project
+      shell: bash
+      run: strong-opx project register "${{ inputs.project-path }}"
+
+    - name: configure ssh for strong-opx
+      if: ${{ inputs.ssh-key }}
+      shell: bash
+      run: |
+        install -m 700 -d ~/.ssh
+        install -m 644 /dev/null ~/.ssh/config
+        install -m 600 <(echo "${{ inputs.ssh-key }}") ~/.ssh/strong-opx-ssh
+        printf "Host *\n\tStrictHostKeyChecking no" >> ~/.ssh/config
+
+        strong-opx config ssh.user ${{ inputs.ssh-user }}
+        strong-opx config ssh.key ~/.ssh/strong-opx-ssh
+
+    - name: configure git credentials for strong-opx
+      if: ${{ inputs.git-ssh-key }}
+      shell: bash
+      run: |
+        install -m 600 <(echo "${{ inputs.git-ssh-key }}") ~/.ssh/strong-opx-git-ssh
+        strong-opx config git.ssh.key ~/.ssh/strong-opx-git-ssh
+
+    - name: get strong-opx executable path
+      id: path
+      shell: bash
+      run: echo "executable-path=$(which strong-opx)" >> $GITHUB_OUTPUT

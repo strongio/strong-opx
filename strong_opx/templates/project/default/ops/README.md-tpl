@@ -1,0 +1,13 @@
+# {{ project_name }}
+
+1. Install `strong-opx` (if not already installed).
+2. Register with strong-opx.
+
+       strong-opx project register ./{{ project_name }}
+
+3. If you have multiple AWS profile setup, set default AWS profile for {{ project_name }}.
+
+       strong-opx config aws.aws_profile <{{ project_name }} maybe?> --project {{ project_name }}
+
+
+Check [`strong-opx` docs](https://docs.strong.io/strong-opx) for additional guide.
