@@ -74,7 +74,7 @@ class VariableRef:
 
         nodes = tuple(extract_ref_nodes(top_node))
         if not nodes:
-            return
+            return None
 
         return VariableRef(name=REF_SEP.join(nodes), nodes=nodes, start_pos=start_position, end_pos=end_position)
 

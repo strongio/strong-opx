@@ -180,7 +180,7 @@ class TemplateCompiler:
 
     def start_else_block(self, start_offset: int, end_offset: int):
         if not hasattr(self.code_modules[-1], "orelse"):
-            self.syntax_error("Cannot start an else block without an if/for block", start_offset, end_offset)
+            raise self.syntax_error("Cannot start an else block without an if/for block", start_offset, end_offset)
 
         self.selected_body = self.code_modules[-1].orelse
 
@@ -240,12 +240,12 @@ class TemplateCompiler:
         if len(args) == 1:
             args = self._compile_node(f"[{args[0]}]", start_offset + len(filter_name)).elts
         elif len(args) > 1:
-            self.syntax_error(f"Invalid Syntax", start_offset, end_offset)
+            raise self.syntax_error(f"Invalid Syntax", start_offset, end_offset)
         else:
             args = []
 
         if filter_name not in TEMPLATE_FILTERS:
-            self.syntax_error(f"Unknown filter: {filter_name}", start_offset, start_offset + len(filter_name))
+            raise self.syntax_error(f"Unknown filter: {filter_name}", start_offset, start_offset + len(filter_name))
 
         pipe_name = f"_p_{filter_name}"
         self.variables.define(pipe_name, TEMPLATE_FILTERS[filter_name])
@@ -273,7 +273,7 @@ class TemplateCompiler:
 
     def compile_if(self, expr: str, offset: int):
         if not expr:
-            self.syntax_error("Missing condition expression", offset, offset + len(expr))
+            raise self.syntax_error("Missing condition expression", offset, offset + len(expr))
 
         expr, start_offset, end_offset = self.str_strip(expr, offset)
         n_expr = self._compile_node(expr, start_offset)
@@ -292,7 +292,7 @@ class TemplateCompiler:
         var_name = var_name.strip()
 
         if not VAR_NAME_RE.match(var_name) or op.strip() != "in" or not container:
-            self.syntax_error("Invalid syntax", start_offset, end_offset)
+            raise self.syntax_error("Invalid syntax", start_offset, end_offset)
 
         self.variables.declare(var_name)
 
@@ -328,16 +328,16 @@ class TemplateCompiler:
         transformer = TemplateNodeTransformer(self, lineno, offset)
         return transformer.visit(expr)
 
-    def disallowed(self, message: str, start_position: Position, end_position: Position):
-        raise TemplateError(
+    def disallowed(self, message: str, start_position: Position, end_position: Position) -> Exception:
+        return TemplateError(
             message,
             file_name=self.file_path,
-            start_position=start_position,
-            end_position=end_position,
+            start_pos=start_position,
+            end_pos=end_position,
         )
 
-    def syntax_error(self, message: str, start_offset: int, end_offset: int):
-        raise TemplateError(
+    def syntax_error(self, message: str, start_offset: int, end_offset: int) -> Exception:
+        return TemplateError(
             message,
             file_name=self.file_path,
             start_pos=self.offset_to_position(start_offset),
@@ -415,7 +415,7 @@ class TemplateNodeTransformer(ast.NodeTransformer):
         self.update_location(node)
 
         if node.attr.startswith("_"):
-            self.compiler.disallowed(f"Unknown attribute: {node.attr}", *self.node_bounds(node))
+            raise self.compiler.disallowed(f"Unknown attribute: {node.attr}", *self.node_bounds(node))
 
         self.skip_refs = self.generate_ref(node)
         node.value = self.visit(node.value)
@@ -426,7 +426,7 @@ class TemplateNodeTransformer(ast.NodeTransformer):
         self.update_location(node)
 
         if node.id.startswith("_"):
-            self.compiler.disallowed("Variable names cannot start with an underscore", *self.node_bounds(node))
+            raise self.compiler.disallowed("Variable names cannot start with an underscore", *self.node_bounds(node))
 
         self.generate_ref(node)
         if node.id in self.compiler.variables:
