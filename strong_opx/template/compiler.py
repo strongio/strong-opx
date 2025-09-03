@@ -318,12 +318,21 @@ class TemplateCompiler:
                 ex.offset += offset - 1
 
             ex.lineno += lineno - 1
+            end_pos = None
+
+            # TODO: Remove check after dropping support for Python < 3.10
+            if getattr(ex, "end_lineno", None) is not None:
+                if ex.end_lineno == 1:
+                    ex.end_offset += offset - 1
+
+                ex.end_lineno += lineno - 1
+                end_pos = Position(ex.end_lineno, ex.end_offset)
 
             raise TemplateError(
                 ex.msg,
                 file_name=self.file_path,
                 start_pos=Position(ex.lineno, ex.offset),
-                end_pos=None,
+                end_pos=end_pos,
             ) from None
 
         transformer = TemplateNodeTransformer(self, lineno, offset)
