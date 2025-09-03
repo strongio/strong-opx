@@ -14,6 +14,7 @@ VAR_NAME_RE = re.compile(r"^[a-zA-Z_][a-zA-Z_0-9]*$")
 
 OUTPUT_VAR_NAME = "_opx_out_"
 CONTEXT_VAR_NAME = "_opx_ctx_"
+INCLUDE_VAR_NAME = "_opx_include_"
 
 
 class TemplateCompiler:
@@ -303,6 +304,22 @@ class TemplateCompiler:
             iter=self._compile_node(container, c_start_offset),
         )
         self.start_block(block, start_offset, end_offset)
+
+    def compile_include(self, args: str, tag_offset: int, start_offset: int, end_offset: int) -> None:
+        arg_start_offset = start_offset + 7
+        indent = self.offset_to_position(tag_offset).column - 1
+
+        node = self._compile_node(f"f({args})", arg_start_offset, -2)
+        node.func = ast.Name(id=INCLUDE_VAR_NAME, ctx=ast.Load())
+
+        has_indent = any(k.arg == "indent" for k in node.keywords)
+        node.keywords.append(ast.keyword(arg="context", value=ast.Name(CONTEXT_VAR_NAME, ctx=CTX_LOAD)))
+        if not has_indent:
+            node.keywords.append(ast.keyword(arg="indent", value=ast.Constant(value=indent, kind=None)))
+
+        self.set_location(node, start_offset, end_offset)
+        self.set_location(node.func, start_offset, arg_start_offset)
+        self.append(node, start_offset, end_offset)
 
     def compile_constant(self, const: str, offset: int) -> None:
         self.append(ast.Constant(value=const, kind=None), offset, offset + len(const))

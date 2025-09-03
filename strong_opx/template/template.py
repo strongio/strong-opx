@@ -1,10 +1,11 @@
 import ast
+import os
 import sys
 import traceback
 from typing import TYPE_CHECKING, Any, Callable, Optional
 
 from strong_opx.exceptions import CommandError, ConfigurationError, TemplateError, UndefinedVariableError, VariableError
-from strong_opx.template.compiler import CONTEXT_VAR_NAME, OUTPUT_VAR_NAME, TemplateCompiler
+from strong_opx.template.compiler import CONTEXT_VAR_NAME, INCLUDE_VAR_NAME, OUTPUT_VAR_NAME, TemplateCompiler
 from strong_opx.template.lexer import LexerError, TemplateLexer, Token
 from strong_opx.template.registry import TEMPLATE_FILTERS
 from strong_opx.template.variable import VariableStore
@@ -28,6 +29,7 @@ class Template:
         filename = self.file_path or "<template>"
         local_context: dict[str, Any] = {
             "lines": [],
+            INCLUDE_VAR_NAME: self.include,
             CONTEXT_VAR_NAME: context,
         }
 
@@ -146,6 +148,8 @@ class Template:
                             raise compiler.syntax_error(
                                 "raw action tag does not take any argument", content.position, content.end_position
                             )
+                    elif action_tag == "include":
+                        compiler.compile_include(tag_args, start.position, content.position, content.end_position)
 
                     elif action_tag.startswith("end"):  # End-something. Pop the ops stack.
                         if tag_args:
@@ -193,6 +197,24 @@ class Template:
 
         self.module = compiler.finalize()
         self.variables = compiler.variables
+
+    def include(self, template_name: str, *, context: "Context", indent=0) -> str:
+        template_dir = "."
+        if self.file_path:
+            template_dir = os.path.dirname(self.file_path)
+
+        template_path = os.path.join(template_dir, template_name)
+        if not os.path.isfile(template_path):
+            raise FileNotFoundError(f"Included template '{template_name}' not found in '{template_dir}'")
+
+        with open(template_path, "r") as f:
+            content = f.read()
+
+        rendered_content = Template(content).render(context)
+        if indent > 0:
+            rendered_content = rendered_content.replace("\n", "\n" + (" " * indent))
+
+        return rendered_content
 
     @classmethod
     def register_filter(cls, name: str, func: Callable = None):
