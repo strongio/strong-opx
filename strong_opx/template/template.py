@@ -1,19 +1,17 @@
 import ast
-import re
 import sys
 import traceback
 from typing import TYPE_CHECKING, Any, Callable, Optional
 
 from strong_opx.exceptions import CommandError, ConfigurationError, TemplateError, UndefinedVariableError, VariableError
 from strong_opx.template.compiler import CONTEXT_VAR_NAME, OUTPUT_VAR_NAME, TemplateCompiler
+from strong_opx.template.lexer import LexerError, TemplateLexer, Token
 from strong_opx.template.registry import TEMPLATE_FILTERS
 from strong_opx.template.variable import VariableStore
 from strong_opx.utils.tracking import Position, get_position
 
 if TYPE_CHECKING:
     from strong_opx.template import Context
-
-TOKEN_RE = re.compile(r"(?s)({{.*?}}|{%.*?%}|{#.*?#}|\${?{[^}]+}}?)")
 
 
 class Template:
@@ -111,86 +109,87 @@ class Template:
         )
 
     def compile(self):
-        offset = 0
-        ops_stack = []
-
-        tokens = [t for t in TOKEN_RE.split(self.value) if t]
+        try:
+            tokens = TemplateLexer(self.value).tokenize()
+        except LexerError as e:
+            raise TemplateCompiler(self.value).syntax_error(e.message, e.start_pos, e.end_pos)
 
         # If there are multiple tokens, render as string otherwise keep the original datatype
         compiler = TemplateCompiler(self.value, as_string=len(tokens) > 1)
-        inside_raw_block = 0
+        ops_stack = []
 
         for token in tokens:
-            if inside_raw_block:
-                action_tag = None
-                if token.startswith("{%"):
-                    action_tag = compiler.str_strip(token[2:-2], offset + 2)[0]
+            if isinstance(token, Token):
+                compiler.compile_constant(token.value, token.position)
+            else:
+                start, content, end = token
 
-                if action_tag == "raw":
-                    inside_raw_block += 1
-                elif action_tag == "endraw":
-                    inside_raw_block -= 1
+                if start.value == "{{":  # An expression to evaluate.
+                    compiler.compile_expression(content.value, content.position)
 
-                if inside_raw_block:
-                    compiler.compile_constant(token, offset)
+                elif start.value.startswith("${"):  # $-style expression.
+                    expr = start.value + content.value + end.value
+                    compiler.compile_legacy_expression(expr, start.position)
 
-            elif token.startswith("{#"):  # Comment: ignore it and move on.
-                pass
+                elif start.value == "{%":  # Action tag: split into words and parse further.
+                    action_tag, tag_args = compiler.split_on_whitespace(content.value)
 
-            elif token.startswith("{{"):  # An expression to evaluate.
-                compiler.compile_expression(token, offset)
+                    if action_tag == "if":  # An if statement: evaluate the expression to determine if.
+                        ops_stack.append(("if", content.position, content.position + 2))
+                        compiler.compile_if(tag_args, content.position)
+                    elif action_tag == "for":  # A loop: iterate over expression result.
+                        ops_stack.append(("for", content.position, content.position + 3))
+                        compiler.compile_for(tag_args, content.position)
+                    elif action_tag == "raw":
+                        # When no-args are given, that scenario is handled separately
+                        if tag_args:
+                            raise compiler.syntax_error(
+                                "raw action tag does not take any argument", content.position, content.end_position
+                            )
 
-            elif token.startswith("${"):  # $-style expression.
-                compiler.compile_legacy_expression(token, offset)
+                    elif action_tag.startswith("end"):  # End-something. Pop the ops stack.
+                        if tag_args:
+                            raise compiler.syntax_error(
+                                "End block does not take any argument", content.position, content.end_position
+                            )
 
-            elif token.startswith("{%"):  # Action tag: split into words and parse further.
-                action_tag, start_offset, end_offset = compiler.str_strip(token[2:-2], offset + 2)
-                action_tag, tag_args = compiler.split_on_whitespace(action_tag)
+                        end_what = action_tag[3:]
+                        if not ops_stack:
+                            raise compiler.syntax_error("Unexpected end block", start.position, start.end_position)
 
-                if action_tag == "if":  # An if statement: evaluate the expression to determine if.
-                    ops_stack.append("if")
-                    compiler.compile_if(tag_args, start_offset + 2)
-                elif action_tag == "for":  # A loop: iterate over expression result.
-                    ops_stack.append("for")
-                    compiler.compile_for(tag_args, start_offset)
-                elif action_tag == "raw":
-                    if tag_args:
-                        compiler.syntax_error("raw action tag does not take any argument", offset, offset + len(token))
+                        start_what = ops_stack.pop()[0]
+                        if start_what != end_what:
+                            raise compiler.syntax_error(
+                                f"Expecting end{start_what} block, got end{end_what}",
+                                start.position,
+                                start.end_position,
+                            )
 
-                    inside_raw_block += 1
-                elif action_tag.startswith("end"):  # End-something. Pop the ops stack.
-                    if tag_args:
-                        compiler.syntax_error("End block does not take any argument", offset, offset + len(token))
+                        compiler.close_block()
+                    elif action_tag == "else":
+                        if tag_args:
+                            raise compiler.syntax_error(
+                                "else block does not take any argument", content.position, content.end_position
+                            )
 
-                    end_what = action_tag[3:]
-                    if not ops_stack:
-                        compiler.syntax_error("Unexpected end block", offset, offset + len(token))
+                        if not ops_stack or ops_stack[-1][0] != "if":
+                            raise compiler.syntax_error("Unexpected else block", content.position, content.end_position)
 
-                    start_what = ops_stack.pop()
-                    if start_what != end_what:
-                        compiler.syntax_error(
-                            f"Expecting end{start_what} block, got end{end_what}", offset, offset + len(token)
+                        compiler.start_else_block(content.position, content.end_position)
+                    else:
+                        raise compiler.syntax_error(
+                            f"Unknown action tag: {action_tag}", content.position, content.end_position
                         )
 
-                    compiler.close_block()
-                elif action_tag == "else":
-                    if tag_args:
-                        compiler.syntax_error("else block does not take any argument", offset, offset + len(token))
+                elif start.value == "{% raw %}":
+                    compiler.compile_constant(content.value, content.position)
 
-                    if not ops_stack or ops_stack[-1] != "if":
-                        compiler.syntax_error("Unexpected else block", offset, offset + len(token))
-
-                    compiler.start_else_block(start_offset, end_offset)
                 else:
-                    compiler.syntax_error(f"Unknown action tag: {action_tag}", start_offset, end_offset)
-
-            else:  # Literal content
-                compiler.compile_constant(token, offset)
-
-            offset += len(token)
+                    raise RuntimeError(f"Internal error: unknown token type: {start.value} at {start.position}")
 
         if ops_stack:
-            compiler.syntax_error("Unclosed tags: {}".format(", ".join(ops_stack)), offset, offset + 1)
+            value, start_pos, end_pos = ops_stack.pop()
+            raise compiler.syntax_error(f"Unclosed tag: {value}", start_pos, end_pos)
 
         self.module = compiler.finalize()
         self.variables = compiler.variables

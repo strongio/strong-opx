@@ -83,11 +83,11 @@ class TestTemplateCompiler(TestCase):
 
     @parameterized.expand(
         [
-            ("{{ SOME_VAR }}", "lines.append(str(_opx_ctx_['SOME_VAR']))"),
-            ("{{ SOME_VAR.foo }}", "lines.append(str(_opx_ctx_['SOME_VAR'].foo))"),
-            ("{{ SOME_VAR.bar() }}", "lines.append(str(_opx_ctx_['SOME_VAR'].bar()))"),
-            ("{{ SOME_VAR[0] }}", "lines.append(str(_opx_ctx_['SOME_VAR'][0]))"),
-            ('{{ SOME_VAR["hello"] }}', "lines.append(str(_opx_ctx_['SOME_VAR']['hello']))"),
+            ("SOME_VAR", "lines.append(str(_opx_ctx_['SOME_VAR']))"),
+            ("SOME_VAR.foo", "lines.append(str(_opx_ctx_['SOME_VAR'].foo))"),
+            ("SOME_VAR.bar()", "lines.append(str(_opx_ctx_['SOME_VAR'].bar()))"),
+            ("SOME_VAR[0]", "lines.append(str(_opx_ctx_['SOME_VAR'][0]))"),
+            ('SOME_VAR["hello"]', "lines.append(str(_opx_ctx_['SOME_VAR']['hello']))"),
         ]
     )
     def test_compile_expression(self, expression: str, expected_src: str):
@@ -99,9 +99,9 @@ class TestTemplateCompiler(TestCase):
 
     @parameterized.expand(
         [
-            ("{{ SOME_VAR|uppercase }}", "lines.append(str(_p_uppercase(_opx_ctx_['SOME_VAR'])))"),
-            ('{{ SOME_VAR|date:"%Y-%m-%d" }}', "lines.append(str(_p_date(_opx_ctx_['SOME_VAR'], '%Y-%m-%d')))"),
-            ("{{ SOME_VAR|uppercase|strip }}", "lines.append(str(_p_strip(_p_uppercase(_opx_ctx_['SOME_VAR']))))"),
+            ("SOME_VAR|uppercase", "lines.append(str(_p_uppercase(_opx_ctx_['SOME_VAR'])))"),
+            ('SOME_VAR|date:"%Y-%m-%d"', "lines.append(str(_p_date(_opx_ctx_['SOME_VAR'], '%Y-%m-%d')))"),
+            ("SOME_VAR|uppercase|strip", "lines.append(str(_p_strip(_p_uppercase(_opx_ctx_['SOME_VAR']))))"),
         ]
     )
     def test_compile_expression__filters(self, expression: str, expected_src: str):
@@ -112,7 +112,7 @@ class TestTemplateCompiler(TestCase):
         self.assertEqual(expected_src, generated_src)
 
     def test_compile_expression__unknown_filter(self):
-        expr = "{{ SOME_VAR|unknown }}"
+        expr = "SOME_VAR|unknown"
         compiler = TemplateCompiler(expr)
 
         with self.assertRaises(TemplateError) as cm:
@@ -121,7 +121,7 @@ class TestTemplateCompiler(TestCase):
         self.assertEqual(cm.exception.errors[0].error, "Unknown filter: unknown")
 
     def test_compile_expression__invalid_filter_args(self):
-        expr = '{{ SOME_VAR|some_filer:"%Y-%m-%d":123 }}'
+        expr = 'SOME_VAR|some_filer:"%Y-%m-%d":123'
         compiler = TemplateCompiler(expr)
 
         with self.assertRaises(TemplateError) as cm:
@@ -130,7 +130,7 @@ class TestTemplateCompiler(TestCase):
         self.assertEqual(cm.exception.errors[0].error, "Invalid Syntax")
 
     def test_compile_expression__filter_included_in_context(self):
-        expr = "{{ SOME_VAR|uppercase }}"
+        expr = "SOME_VAR|uppercase"
         compiler = TemplateCompiler(expr)
         compiler.compile_expression(expr, 0)
 

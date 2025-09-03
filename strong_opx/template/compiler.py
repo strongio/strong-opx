@@ -196,7 +196,7 @@ class TemplateCompiler:
         return module
 
     def compile_expression(self, expr: str, offset: int) -> None:
-        expression = self._compile_expression(expr[2:-2], offset + 2)
+        expression = self._compile_expression(expr, offset)
         self.append(expression, offset, offset + len(expr))
 
     def _compile_expression(self, expr: str, offset: int) -> ast.expr:
@@ -275,11 +275,11 @@ class TemplateCompiler:
         if not expr:
             raise self.syntax_error("Missing condition expression", offset, offset + len(expr))
 
-        expr, start_offset, end_offset = self.str_strip(expr, offset)
+        expr, start_offset, end_offset = self.str_strip(expr, offset + 2)
         n_expr = self._compile_node(expr, start_offset)
         block: ast.If = ast.If(n_expr, body=[], orelse=[])
 
-        self.start_block(block, start_offset, end_offset)
+        self.start_block(block, offset, end_offset)
 
     def compile_for(self, expr: str, offset: int):
         expr, start_offset, end_offset = self.str_strip(expr, offset)
@@ -307,8 +307,9 @@ class TemplateCompiler:
     def compile_constant(self, const: str, offset: int) -> None:
         self.append(ast.Constant(value=const, kind=None), offset, offset + len(const))
 
-    def _compile_node(self, value: str, offset: int) -> ast.expr:
+    def _compile_node(self, value: str, offset: int, offset_drift: int = 0) -> ast.expr:
         lineno, offset = self.offset_to_position(offset)
+        offset += offset_drift
 
         try:
             expr = ast.parse(value, mode="eval").body

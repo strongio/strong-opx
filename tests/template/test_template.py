@@ -118,7 +118,7 @@ class TemplateTest(TestCase):
         with self.assertRaises(TemplateError) as cm:
             Template("{% if some_something %}false")
 
-        self.assertEqual(cm.exception.errors[0].error, "Unclosed tags: if")
+        self.assertEqual(cm.exception.errors[0].error, "Unclosed tag: if")
 
     def test_action_tag__raw(self):
         t = Template("{% raw %}{{ i }}{% endraw %}")
@@ -127,10 +127,10 @@ class TemplateTest(TestCase):
         self.assertEqual(rendered, "{{ i }}")
 
     def test_action_tag__nested_raw(self):
-        t = Template("{% raw %}{% raw %}{{ i }}{% endraw %}{% endraw %}")
+        t = Template("{% raw %}{% raw %}{{ i }}{% endraw %}")
         rendered = t.render(self.context1)
 
-        self.assertEqual(rendered, "{% raw %}{{ i }}{% endraw %}")
+        self.assertEqual(rendered, "{% raw %}{{ i }}")
 
     def test_action_tag__action_tag_inside_raw(self):
         t = Template("{% raw %}{% if %}{% endif %}{% endraw %}")
@@ -146,10 +146,10 @@ class TemplateTest(TestCase):
 
     def test_missing_key(self):
         with self.assertRaises(UndefinedVariableError):
-            Template("${VAR_5}").render(self.context2)
+            Template("{{ VAR_5 }}").render(self.context2)
 
     def test_missing_key__with_position(self):
-        value = OpxString("${VAR_5}")
+        value = OpxString("{{ VAR_5 }}")
         set_position(value, "some-file", Position(1, 10), Position(1, 10 + len(value)))
 
         with self.assertRaises(UndefinedVariableError) as cm:
@@ -157,11 +157,11 @@ class TemplateTest(TestCase):
 
         self.assertEqual(cm.exception.names, ("VAR_5",))
         self.assertEqual(cm.exception.errors[0].file_path, "some-file")
-        self.assertEqual(cm.exception.errors[0].start_pos, Position(1, 12))
-        self.assertEqual(cm.exception.errors[0].end_pos, Position(1, 17))
+        self.assertEqual(cm.exception.errors[0].start_pos, Position(1, 13))
+        self.assertEqual(cm.exception.errors[0].end_pos, Position(1, 18))
 
     def test_missing_key__multiline_with_position(self):
-        value = OpxString("line before\n${VAR_5}\nline after")
+        value = OpxString("line before\n{{ VAR_5 }}\nline after")
         set_position(value, "some-file", Position(1, 11), Position(3, 11))
 
         with self.assertRaises(UndefinedVariableError) as cm:
@@ -169,8 +169,8 @@ class TemplateTest(TestCase):
 
         self.assertEqual(cm.exception.names, ("VAR_5",))
         self.assertEqual(cm.exception.errors[0].file_path, "some-file")
-        self.assertEqual(cm.exception.errors[0].start_pos, Position(2, 3))
-        self.assertEqual(cm.exception.errors[0].end_pos, Position(2, 8))
+        self.assertEqual(cm.exception.errors[0].start_pos, Position(2, 4))
+        self.assertEqual(cm.exception.errors[0].end_pos, Position(2, 9))
 
     def test_render_non_string(self):
         t = Template("{{ dt }}")
