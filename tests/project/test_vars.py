@@ -13,13 +13,13 @@ class VariableConfigTest(TestCase):
 
     @parameterized.expand(
         [
-            ("${ENVIRONMENT}.yml", ["unittest.yml"]),
-            (["${ENVIRONMENT}/something.yml", "${ENVIRONMENT}.yml"], ["unittest/something.yml", "unittest.yml"]),
+            ("{{ ENVIRONMENT }}.yml", ["unittest.yml"]),
+            (["{{ ENVIRONMENT }}/something.yml", "{{ ENVIRONMENT }}.yml"], ["unittest/something.yml", "unittest.yml"]),
             ({"unittest": "something.yml"}, ["something.yml"]),
             ({"some-env": "something.yml"}, []),
             ({"unittest": ["var1.yml", "var2.yml"]}, ["var1.yml", "var2.yml"]),
             ({"some-env": ["var1.yml", "var2.yml"]}, []),
-            (["${ENVIRONMENT}/something.yml", {"unittest": "var1.yml"}], ["unittest/something.yml", "var1.yml"]),
+            (["{{ ENVIRONMENT }}/something.yml", {"unittest": "var1.yml"}], ["unittest/something.yml", "var1.yml"]),
             (["common.yml", {"unittest": ["var1.yml", "var2.yml"]}], ["common.yml", "var1.yml", "var2.yml"]),
             (["common.yml", {"some-env": ["var1.yml", "var2.yml"]}], ["common.yml"]),
         ]

@@ -16,31 +16,31 @@ class ObjectTemplateTests(TestCase):
     @parameterized.expand(
         [
             # Mapping with strings
-            ({"V1": "${VI}"}, {"V1": "i"}),
-            ({"V1": "${VI}"}, {"V1": "i"}),
-            ({"V1": "${V2}", "V2": "${VI}"}, {"V1": "i", "V2": "i"}),
+            ({"V1": "{{ VI }}"}, {"V1": "i"}),
+            ({"V1": "{{ VI }}"}, {"V1": "i"}),
+            ({"V1": "{{ V2 }}", "V2": "{{ VI }}"}, {"V1": "i", "V2": "i"}),
             # Mapping with collections
-            ({"V1": ["${VI}"]}, {"V1": ["i"]}),
-            ({"V1": ["${VI}"], "V2": ["${V1}"]}, {"V1": ["i"], "V2": [["i"]]}),
+            ({"V1": ["{{ VI }}"]}, {"V1": ["i"]}),
+            ({"V1": ["{{ VI }}"], "V2": ["{{ V1 }}"]}, {"V1": ["i"], "V2": [["i"]]}),
             # Referring to an index of a collection
-            ({"V1": ["${VSEQ[3]}", "${VSEQ[0]}"]}, {"V1": ["iv", "i"]}),
+            ({"V1": ["{{ VSEQ[3] }}", "{{ VSEQ[0] }}"]}, {"V1": ["iv", "i"]}),
             # Mapping
-            ({"V1": {"V2": "${VI}"}}, {"V1": {"V2": "i"}}),
-            ({"V1": {"${V1}": "${VI}"}}, {"V1": {"${V1}": "i"}}),  # Keys shouldn't be resolved
-            ({"V1": {"V2": "${VI}"}, "V3": {"V4": "${V1}"}}, {"V1": {"V2": "i"}, "V3": {"V4": {"V2": "i"}}}),
+            ({"V1": {"V2": "{{ VI }}"}}, {"V1": {"V2": "i"}}),
+            ({"V1": {"{{ V1 }}": "{{ VI }}"}}, {"V1": {"{{ V1 }}": "i"}}),  # Keys shouldn't be resolved
+            ({"V1": {"V2": "{{ VI }}"}, "V3": {"V4": "{{ V1 }}"}}, {"V1": {"V2": "i"}, "V3": {"V4": {"V2": "i"}}}),
             # Nested mapping
-            ({"V1": [{"V2": "${VI}"}]}, {"V1": [{"V2": "i"}]}),
-            ({"V1": {"V2": ["${VI}"]}}, {"V1": {"V2": ["i"]}}),
+            ({"V1": [{"V2": "{{ VI }}"}]}, {"V1": [{"V2": "i"}]}),
+            ({"V1": {"V2": ["{{ VI }}"]}}, {"V1": {"V2": ["i"]}}),
             # Nested mapping
-            ({"V1": '${VNESTED["VINNER"]}'}, {"V1": "inner"}),
+            ({"V1": '{{ VNESTED["VINNER"] }}'}, {"V1": "inner"}),
             # String
-            ("${VI}", "i"),
+            ("{{ VI }}", "i"),
             ("no substitutions", "no substitutions"),
             # Non-string "raw" value
             (123, 123),
             # Collection
             (
-                ["${VI}", 2, "three", {"four": '${VNESTED["VINNER"]}'}, "${VSEQ[3][1:]}"],
+                ["{{ VI }}", 2, "three", {"four": '{{ VNESTED["VINNER"] }}'}, "{{ VSEQ[3][1:] }}"],
                 ["i", 2, "three", {"four": "inner"}, "v"],
             ),
         ]
@@ -57,13 +57,13 @@ class ObjectTemplateTests(TestCase):
 
     def test_unknown_variable(self):
         with self.assertRaises(UndefinedVariableError) as cm:
-            ObjectTemplate(Context()).render({"V1": "${VI}"})
+            ObjectTemplate(Context()).render({"V1": "{{ VI }}"})
 
         self.assertEqual(cm.exception.names, ("VI",))
 
     def test_circular_dependency(self):
         with self.assertRaises(VariableError) as cm:
-            ObjectTemplate(Context()).render({"V1": "${V2}", "V2": "${V1}"})
+            ObjectTemplate(Context()).render({"V1": "{{ V2 }}", "V2": "{{ V1 }}"})
 
         self.assertEqual(
             "{Fore.RED}Error:{Fore.RESET} {Style.BRIGHT}Found circular dependency: V1 -> " "V2 -> V1{Style.RESET_ALL}",
@@ -72,7 +72,7 @@ class ObjectTemplateTests(TestCase):
 
     def test_deep_circular_dependency(self):
         with self.assertRaises(VariableError) as cm:
-            ObjectTemplate(Context()).render({"V1": "${V2}", "V2": "${V3}", "V3": "${V4}", "V4": "${V1}"})
+            ObjectTemplate(Context()).render({"V1": "{{ V2 }}", "V2": "{{ V3 }}", "V3": "{{ V4 }}", "V4": "{{ V1 }}"})
 
         self.assertEqual(
             (
@@ -88,7 +88,7 @@ class ObjectTemplateTests(TestCase):
         rendered_value = ObjectTemplate(context).render(
             {
                 "not_frozen": "steve",
-                "uses_not_frozen": "blah ${not_frozen}",
+                "uses_not_frozen": "blah {{ not_frozen }}",
             }
         )
 
@@ -106,7 +106,7 @@ class ObjectTemplateTests(TestCase):
         rendered_value = ObjectTemplate(context).render(
             {
                 "frozen": "steve",
-                "uses_overriden": "blah ${frozen}",
+                "uses_overriden": "blah {{ frozen }}",
             }
         )
 
@@ -126,7 +126,7 @@ class ObjectTemplateTests(TestCase):
 
         # This test will pass if the 'not_frozen' comes before the 'uses_not_frozen' key
         rendered_value = ObjectTemplate(context).render(
-            {"uses_not_frozen": "blah ${not_frozen}", "not_frozen": "${other} steve", "other": "other"}
+            {"uses_not_frozen": "blah {{ not_frozen }}", "not_frozen": "{{ other }} steve", "other": "other"}
         )
 
         self.assertDictEqual(
@@ -138,8 +138,8 @@ class ObjectTemplateTests(TestCase):
 
         rendered_value = ObjectTemplate(context).render(
             {
-                "top": {"nested": 'new top.nested value ${foo["baz"]}'},
-                "foo": {"bar": '${top["nested"]} 2', "baz": "buzz"},
+                "top": {"nested": 'new top.nested value {{ foo["baz"] }}'},
+                "foo": {"bar": '{{ top["nested"] }} 2', "baz": "buzz"},
             }
         )
 
