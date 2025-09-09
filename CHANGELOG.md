@@ -2,6 +2,14 @@
 
 <!-- version list -->
 
+## v1.1.1 (2025-09-09)
+
+### Bug Fixes
+
+- Remove hardcoded tfbackend path and look for *.tfbackend
+  ([`73f28e0`](https://github.com/strongio/strong-opx/commit/73f28e00f36e547c938131e55ed56076439d8a9f))
+
+
 ## v1.1.0 (2025-09-08)
 
 ### Bug Fixes
