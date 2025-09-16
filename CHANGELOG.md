@@ -2,6 +2,14 @@
 
 <!-- version list -->
 
+## v1.1.2 (2025-09-16)
+
+### Bug Fixes
+
+- Use environment to render FileTemplate using jinja2
+  ([`d6e024a`](https://github.com/strongio/strong-opx/commit/d6e024ae66dd017886db9a141953aed7100713b0))
+
+
 ## v1.1.1 (2025-09-09)
 
 ### Bug Fixes
