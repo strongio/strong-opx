@@ -127,7 +127,7 @@ class HelmManager:
                 if not os.path.exists(file_path):
                     raise HelmError(f"Unable to locate specified values {chart.values} for {chart.name}")
 
-                with tempfile.NamedTemporaryFile() as f:
+                with tempfile.NamedTemporaryFile(suffix=f"_{os.path.basename(file_path)}") as f:
                     FileTemplate(file_path).render_to_file(f.name, self.platform.environment.context)
 
                     args.append("--values")

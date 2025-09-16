@@ -1,12 +1,9 @@
-import io
 import os
 
 import jinja2
 
-from strong_opx import yaml
 from strong_opx.config import opx_config
 from strong_opx.template.context import Context
-from strong_opx.template.object_template import ObjectTemplate
 from strong_opx.template.template import Template
 from strong_opx.utils.tracking import OpxString, Position, set_position
 
@@ -32,7 +29,9 @@ class FileTemplate:
         return Template(content).render(context)
 
     def _render_with_jinja2(self, context: Context) -> str:
-        template = jinja2.Template(self.content)
+        loader = jinja2.FileSystemLoader(os.path.dirname(self.file_path))
+        environment = jinja2.Environment(loader=loader)
+        template = environment.from_string(self.content)
         return template.render(**context.as_dict())
 
     def render_to_file(self, target_path: str, context: Context) -> None:
