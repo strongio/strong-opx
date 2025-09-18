@@ -24,13 +24,11 @@ dependencies = [
     "Jinja2",
     "PyYAML",
     "ansible",
-    "awscli",
-    "boto3",
     "colorama",
     "filelock",
     "prompt-toolkit>=3.0.39",
     "pydantic>=2",
-    "tabulate"
+    "tabulate",
 ]
 dynamic = ["version"]
 
@@ -48,7 +46,14 @@ dev = [
     "black",
     "coverage",
     "parameterized",
-    "astunparse"
+    "astunparse",
+]
+aws = [
+    "awscli",
+    "boto3",
+]
+standard = [
+    "strong-opx[aws]",
 ]
 
 [project.scripts]
