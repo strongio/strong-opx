@@ -52,8 +52,12 @@ aws = [
     "awscli",
     "boto3",
 ]
+azure = [
+    "azure-identity",
+    "azure-keyvault-secrets",
+]
 standard = [
-    "strong-opx[aws]",
+    "strong-opx[aws,azure]",
 ]
 
 [project.scripts]
