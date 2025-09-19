@@ -10,16 +10,22 @@ Configuration
    aws: # Optional - AWS Configuration specific to environment
      region: <region-name>    # Optional: AWS region
 
+   azure: # Optional - Azure Configuration specific to environment
+     subscription_id: <subscription-id>
+     resource_group: <resource-group>
+     tenant_id: <tenant-id>
+
    strong_opx: # Optional
      required_version:  # Optional: Strong-OpX version requirements. i.e. "<1.14", ">=1.2", "==1.2" etc
      templating_engine: <'basic', 'jinja2'> # Optional: templating engine to use, defaults to 'basic'
 
    secret: # Required - Secret used to encrypt/decrypt vars
-     provider: <name>    # Required: Name of secret provider. Currently, only aws_ssm is supported
+     provider: <name>    # Required: Name of secret provider. Currently, only 'aws_ssm' or 'keyvault' are supported
      parameter: <name>   # Required: AWS SSM Parameter Name. It supports template i.e. secret-${ENVIRONMENT} will resolve
                          # to secret-production in case of production environment
      secret_length: <int>  # Optional - Secret length (Only used when secret is created). Default is 24
      upsert: <bool>        # Optional - If specified, secret will be created if that is missing. Default to True
+     keyvault_url: <keyvault-url>  # required for keyvault secret provider
 
    vars: # Required - See below for details
 
