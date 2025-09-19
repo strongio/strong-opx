@@ -2,6 +2,29 @@
 
 <!-- version list -->
 
+## v1.2.0 (2025-09-19)
+
+### Chores
+
+- Only release from master branch
+  ([`0576355`](https://github.com/strongio/strong-opx/commit/0576355b163e52c41c2974a109435d092650c345))
+
+### Documentation
+
+- Improve docs [skip ci]
+  ([`503fc6e`](https://github.com/strongio/strong-opx/commit/503fc6e00532bd7f544dafe5af73129a59eeba14))
+
+### Features
+
+- Azure Secret Provider ([#1](https://github.com/strongio/strong-opx/pull/1),
+  [`d7a467c`](https://github.com/strongio/strong-opx/commit/d7a467c4a76d973906744384ba802ff2cdfbd76e))
+
+### Refactoring
+
+- Remove aws dependencies to optional dependencies [skip ci]
+  ([`4d2ba2f`](https://github.com/strongio/strong-opx/commit/4d2ba2f744063ff0852780460971f2867d3e3ee7))
+
+
 ## v1.1.2 (2025-09-16)
 
 ### Bug Fixes
