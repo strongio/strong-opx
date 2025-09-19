@@ -1,7 +1,7 @@
 from typing import TYPE_CHECKING, Callable
 
-from strong_opx.providers.aws.context_hooks import update_environ_hook
 from strong_opx.providers.azure.config import AzureConfig
+from strong_opx.providers.azure.context_hooks import update_environ_hook
 from strong_opx.providers.provider import Provider
 
 if TYPE_CHECKING:
