@@ -9,6 +9,11 @@ Configuration
    aws: # Optional - AWS Configuration specific to environment
      region: <region-name>   # Optional: AWS region
 
+   azure: # Optional - Azure Configuration specific to environment
+     subscription_id: <subscription-id>
+     resource_group: <resource-group>
+     tenant_id: <tenant-id>
+
    vars: # Optional - Additional vars for this environment
      <key>: <value>          # Required - A key value pair. Should not hold any secret info
 
