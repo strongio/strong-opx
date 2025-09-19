@@ -1,6 +1,13 @@
 Platform: Kubernetes
 ====================
 
+**Kubernetes Platform** abstracts your infrastructure into Kubernetes clusters. For environments that use
+Kubernetes, Strong-OpX will deploy resources using kubectl (the command-line tool for interacting with
+Kubernetes clusters). This platform is ideal for managing containerized applications and deployments within a
+Kubernetes Cluster.
+
+Kubernetes platform will be automatically selected if your environment configuration contains ``kubernetes`` key.
+
 Configuration
 -------------
 
@@ -54,12 +61,12 @@ staging environment that file will be deployed. If you trigger a
 production environment deployment, ``foo`` will not be deployed.
 
 Updating ``kubeconfig``
-~~~~~~~~~~~~~~~~~~~~~~~
+-----------------------
 
 ``kubeconfig`` is cached and in case cluster is redeployed or for some
 reasons ``kubeconfig`` needs to be updated, use below command to update
 ``kubeconfig``.
 
-::
+.. code:: shell
 
    strong-opx kubectl --update-kubeconfig -- version

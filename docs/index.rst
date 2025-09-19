@@ -30,8 +30,8 @@ Strong-OpX can simplify your deployment pipeline and accelerate your infrastruct
    ref/helm
    ref/project
    ref/environment
-   ref/platform-generic
-   ref/platform-kubernetes
+   ref/providers/index
+   ref/platforms/index
    ref/kubernetes-plugins
    ref/config
    ref/templating-language
@@ -41,4 +41,5 @@ Strong-OpX can simplify your deployment pipeline and accelerate your infrastruct
    :caption: Guides
 
    working-with-projects
+   working-with-terraform
    using-aws-profiles-with-mfa

@@ -15,7 +15,6 @@ project, such as configuring AWS credentials or interacting with general system 
    :maxdepth: 1
 
    aws-configure
-   aws-ec2
    aws-mfa
    config
    project
@@ -51,6 +50,7 @@ corrective steps.
 .. toctree::
    :maxdepth: 1
 
+   compute
    deploy
    docker-build
    generate
@@ -72,11 +72,11 @@ Getting Help
 To get detailed help for any command, simply append the `--help` flag to the command. This will display a
 comprehensive breakdown of the command’s syntax, available options, and examples of how to use it.
 
-For example, to get help with the `aws:ec2` command, you would run:
+For example, to get help with the `compute` command, you would run:
 
 .. code-block:: bash
 
-    strong-opx aws:ec2 --help
+    strong-opx compute --help
 
 This will show you the available options and, where applicable, examples that demonstrate how to use the command
 effectively.

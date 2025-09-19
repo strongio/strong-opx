@@ -33,31 +33,37 @@ configurations and settings for each environment within a project.
 
 .. seealso::
     - :doc:`./ref/environment`
+    - :doc:`./working-with-terraform`
 
 Platform
 --------
 
-Each environment in Strong-OpX can utilize one or more Platforms to define where and how your infrastructure is
-deployed. However, platforms do not need to be explicitly defined in your configuration. Based on the settings
-specified in the `config.yml` file, Strong-OpX automatically determines the appropriate platform for the environment.
-
-There are two main types of platforms supported:
-
-1. **Generic Platform** is used to manage EC2 instances directly. If your environment is set to use this
-   platform, Strong-OpX will leverage Ansible playbooks for deployment. Ansible allows you to automate the setup,
-   configuration, and management of EC2 instances, providing an efficient way to handle your infrastructure.
-
-2. **Kubernetes Platform** abstracts your infrastructure into Kubernetes clusters. For environments that use
-   Kubernetes, Strong-OpX will deploy resources using kubectl (the command-line tool for interacting with
-   Kubernetes clusters). This platform is ideal for managing containerized applications and deployments within a
-   Kubernetes environment.
-
-While you don’t need to manually define the platform in the configuration, Strong-OpX will intelligently pick the
-correct platform based on the provided configuration details, enabling the appropriate deployment method to be used.
+A **Platform** defines the environment where your infrastructure is deployed and managed. Platforms serve as an
+abstraction layer that allows you to interact with different types of infrastructure without needing to worry about
+the underlying details. Platform configurations are specified within the `config.yml` file of each environment.
 
 .. seealso::
-    - :doc:`./ref/platform-generic`
-    - :doc:`./ref/platform-kubernetes`
+    For details about platforms configurations and available platform, see the
+    :doc:`ref/platforms/index` documentation.
+
+Provider
+--------
+
+A **Provider** in Strong-OpX represents an integration with a cloud platform, such as AWS or Azure. Providers are
+responsible for enabling Strong-OpX to manage resources and perform operations on these platforms. Each provider
+exposes a set of features, such as compute instance management, Kubernetes and Helm operations, container image
+building, and secret management. The specific features available depend on the provider.
+
+One project can utilize only one provider. To choose a provider for your project, you need to specify it in the
+project configuration file (`strong-opx.yml`).
+
+Provider specific additional configuration can also be specified in an environment-specific configuration file
+(`environments/<environment>/config.yml`). Strong-OpX will use the most specific configuration available for the
+current environment.
+
+.. seealso::
+    For details on configuring each provider and their supported features, see the
+    :doc:`ref/providers/index` documentation.
 
 With these concepts in place, you can use Strong-OpX to create, manage, and deploy your projects in a structured and
 consistent way, while ensuring that all variables, secrets, and configurations are handled securely and efficiently.

@@ -6,16 +6,11 @@ Configuration
 
 .. code:: yaml
 
-   aws: # Optional - AWS Configuration specific to environment
-     region: <region-name>   # Optional: AWS region
-
-   azure: # Optional - Azure Configuration specific to environment
-     subscription_id: <subscription-id>
-     resource_group: <resource-group>
-     tenant_id: <tenant-id>
-
    vars: # Optional - Additional vars for this environment
      <key>: <value>          # Required - A key value pair. Should not hold any secret info
+
+Environment can also hold additional configuration sections specific to provider & platform.
+Check :doc:`./providers/index` and :doc:`./platforms/index` for specific configuration.
 
 Using Terraform to write vars
 -----------------------------
@@ -33,7 +28,7 @@ include terraform output. A practical example is:
 
      provisioner "local-exec" {
        command = <<HEREDOC
-   cat<<EOF > ${path.module}/config.yml
+   cat<<EOF > ${path.module}/../environments/${var.ENVIRONMENT}/config.yml
    # Generated Code. Changes will be lost on next terraform apply
    aws:
      region: ${var.AWS_REGION}
@@ -55,30 +50,6 @@ include terraform output. A practical example is:
      }
    }
 
-Using Common Terraform Files
-----------------------------
 
-As of v0.19.2, strong-opx now supports the use of common Terraform
-files. These files must be placed in the \*-ops repo under a directory
-named ``terraform``. ``strong-opx`` will check for a
-``<environment>.s3.tfstate`` in the ``environments/<environment>/``
-directory, and will use the common files in the ``terraform`` directory
-if the tfstate file exists.
-
-An example directory structure:
-
-::
-
-   my-project/
-     |
-     |--- environments/
-     |          |
-     |          |--- development/
-     |                   |
-     |                   |-- development.s3.tfstate
-     |
-     |--- terraform/
-     |       |
-     |       |--- main.tf
-     |       |--- variables.tf
-     |       | etc...
+.. seealso::
+    - :doc:`../working-with-terraform`

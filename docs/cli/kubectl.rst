@@ -17,4 +17,4 @@
 
 .. seealso::
 
-    For more details on structuring kubernetes artifacts: :doc:`../ref/platform-kubernetes`.
+    For more details on structuring kubernetes artifacts: :doc:`../ref/platforms/kubernetes`.

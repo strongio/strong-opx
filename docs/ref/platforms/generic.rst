@@ -1,6 +1,12 @@
 Platform: Generic
 =================
 
+**Generic Platform** is used to manage compute instances directly. If your environment is set to use this
+platform, Strong-OpX will leverage Ansible playbooks for deployment. Ansible allows you to automate the setup,
+configuration, and management of compute instances, providing an efficient way to handle your infrastructure.
+
+Generic platform will be automatically selected if your environment configuration contains ``hosts`` key.
+
 Configuration
 -------------
 
@@ -15,8 +21,8 @@ Generic platform configuration goes inside environment config.
        - ...
      ...
 
-Hosts must contain atleast one host group and each host group can
-atleast contain one host IP address. There is no upper bound on host
+Hosts must contain at-least one host group and each host group can
+at-least contain one host IP address. There is no upper bound on host
 group and hosts within host group.
 
 bastion
