@@ -3,7 +3,7 @@ description: 'Install and Configure Strong-OpX'
 inputs:
   version:
     description: 'Version to install'
-    default: latest
+    default: '1.2.0'
   python-version:
     description: 'Python version to use'
     default: '3.10'
@@ -53,7 +53,7 @@ runs:
       run: |
         source /opt/strong-opx/bin/activate
         python_version=$(echo "cp${{ inputs.python-version }}" | sed 's/\.//g')
-        python -m pip install "strong-opx @ https://s3-us-west-2.amazonaws.com/strong-packages/strong_opx-${{ inputs.version }}-${python_version}-${python_version}-manylinux_2_17_x86_64.manylinux2014_x86_64.whl"
+        python -m pip install "strong-opx==${{ inputs.version }}"
 
     - name: register project
       shell: bash
