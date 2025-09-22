@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "strong-opx"
-description = "Tools for deploying and managing Strong infrastructure"
+description = "Tools for deploying and managing infrastructure"
 readme = "README.md"
 requires-python = ">=3.9"
 classifiers = [
@@ -18,7 +18,7 @@ classifiers = [
 ]
 license = { file = "LICENSE" }
 authors = [
-    { name = "Strong Analytics", email = "contact@strong.io" }
+    { name = "Adnan Umer", email = "u.adnan@outlook.com" }
 ]
 dependencies = [
     "Jinja2",
