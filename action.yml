@@ -1,6 +1,9 @@
 name: 'Setup Strong-Opx'
 description: 'Install and Configure Strong-OpX'
 inputs:
+  version:
+    description: 'Strong-OpX version to use. If not provided, the version of the action will be used.'
+    default: ''
   python-version:
     description: 'Python version to use'
     default: '3.10'
@@ -31,7 +34,11 @@ runs:
       id: get-version
       run: |
         # Extract version from github.action_ref (e.g., v1.2 from example/my-repo@v1.2)
-        VERSION=$(echo "${{ github.action_ref }}" | sed 's/^v//')
+        if [ -z "${{ inputs.version }}" ]; then
+          VERSION=$(echo "${{ github.action_ref }}" | sed 's/^v//')
+        else
+          VERSION="${{ inputs.version }}"
+        fi
         echo "version=$VERSION" >> $GITHUB_OUTPUT
       shell: bash
 
