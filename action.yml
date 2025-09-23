@@ -33,8 +33,8 @@ runs:
     - name: Extract version tag from action reference
       id: get-version
       run: |
-        # Extract version from github.action_ref (e.g., v1.2 from example/my-repo@v1.2)
         if [ -z "${{ inputs.version }}" ]; then
+          # Extract version from github.action_ref (e.g., v1.2 from strongio/strong-opx@v1.2)
           VERSION=$(echo "${{ github.action_ref }}" | sed 's/^v//')
         else
           VERSION="${{ inputs.version }}"
@@ -64,8 +64,7 @@ runs:
       shell: bash
       run: |
         source /opt/strong-opx/bin/activate
-        python_version=$(echo "cp${{ inputs.python-version }}" | sed 's/\.//g')
-        if [ "${{ github.action_ref }}" = "master" ]; then
+        if [ "${{ github.action_ref }}" = "master" ] && [ -z "${{ inputs.version }}" ]; then
           pip install strong-opx
         else
           pip install "strong-opx==${{ steps.get-version.outputs.version }}"
