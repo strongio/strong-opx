@@ -90,18 +90,12 @@ jobs:
         run: |
           pip freeze
 
-  release:
+  tag:
     needs: [ lint, test, smoke_test ]
     if: github.ref == 'refs/heads/master'
     concurrency:
-      group: release
+      group: tag
     runs-on: ubuntu-latest
-    environment:
-      name: pypi
-      url: https://pypi.org/p/strong-opx
-    permissions:
-      contents: write # to clone repo
-      id-token: write # to publish to PyPI
 
     steps:
       - uses: actions/checkout@0ad4b8fadaa221de15dcec353f45205ec38ea70b # 4.1.4
@@ -111,11 +105,7 @@ jobs:
 
       - name: Install Dependencies
         run: |
-          pip install --upgrade python-semantic-release build twine
-
-      - name: Build package distributions
-        run: |
-          python -m build
+          pip install --upgrade python-semantic-release
 
       - name: Publish to VCS
         run: |
@@ -124,6 +114,3 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
           GIT_COMMIT_AUTHOR: "Strong Analytics <access@strong.io>"
-
-      - name: Publish package distributions to PyPI
-        uses: pypa/gh-action-pypi-publish@76f52bc884231f62b9a034ebfe128415bbaabdfc

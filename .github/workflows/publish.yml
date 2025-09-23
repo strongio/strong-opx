@@ -1,0 +1,32 @@
+name: Publish to PyPI
+
+on:
+  push:
+    tags:
+      - 'v[0-9]+.[0-9]+.[0-9]+'  # Matches vX.Y.Z (e.g., v1.0.0, v2.3.4)
+
+jobs:
+  publish:
+    concurrency:
+      group: publish
+    runs-on: ubuntu-latest
+    environment:
+      name: PyPI
+      url: https://pypi.org/p/strong-opx
+    permissions:
+      contents: read # to clone repo
+      id-token: write # to publish to PyPI
+
+    steps:
+      - uses: actions/checkout@0ad4b8fadaa221de15dcec353f45205ec38ea70b # 4.1.4
+
+      - name: Install Dependencies
+        run: |
+          pip install --upgrade build twine
+
+      - name: Build package distributions
+        run: |
+          python -m build
+
+      - name: Publish package distributions to PyPI
+        uses: pypa/gh-action-pypi-publish@76f52bc884231f62b9a034ebfe128415bbaabdfc
