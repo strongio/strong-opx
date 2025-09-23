@@ -7,6 +7,9 @@ inputs:
   python-version:
     description: 'Python version to use'
     default: '3.12'
+  provider:
+    description: 'Provider to use'
+    default: 'aws'
   project-path:
     description: 'Project path'
     required: true
@@ -65,9 +68,9 @@ runs:
       run: |
         source /opt/strong-opx/bin/activate
         if [ "${{ github.action_ref }}" = "master" ] && [ -z "${{ inputs.version }}" ]; then
-          pip install strong-opx
+          pip install "strong-opx[${{ inputs.provider }}]"
         else
-          pip install "strong-opx==${{ steps.get-version.outputs.version }}"
+          pip install "strong-opx[${{ inputs.provider }}]==${{ steps.get-version.outputs.version }}"
         fi
 
     - name: register project
