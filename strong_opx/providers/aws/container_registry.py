@@ -4,7 +4,7 @@ from functools import cached_property
 from typing import Any, Generator, Optional
 
 import boto3
-from botocore.exceptions import ClientError
+from botocore.exceptions import ClientError, NoCredentialsError
 
 from strong_opx.project import Project
 from strong_opx.providers.aws.config import get_aws_config
@@ -62,7 +62,7 @@ class ContainerRegistry(AbstractContainerRegistry):
     def get_repository_uri(self, repository_name: str) -> Optional[str]:
         try:
             response = self.client.describe_repositories(repositoryNames=[repository_name])
-        except ClientError as e:
+        except (ClientError, NoCredentialsError) as e:
             handle_boto_error(e)
         else:
             return response["repositories"][0]["repositoryUri"]
@@ -74,5 +74,5 @@ class ContainerRegistry(AbstractContainerRegistry):
                 for image in page["imageDetails"]:
                     for tag in image.get("imageTags", []):
                         yield tag
-        except ClientError as e:
+        except (ClientError, NoCredentialsError) as e:
             handle_boto_error(e, ignore=("RepositoryNotFoundException",))

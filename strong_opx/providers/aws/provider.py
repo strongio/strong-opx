@@ -174,11 +174,7 @@ class AWSProvider(Provider):
         os.environ.pop("AWS_PROFILE", None)  # Remove AWS_PROFILE env if it exists
 
     def handle_error(self, ex: Exception) -> None:
-        if isinstance(ex, NoCredentialsError):
-            print("error: Unable to locate AWS Credentials", file=sys.stderr)
-            exit(10)
-
-        elif isinstance(ex, ClientError):
+        if isinstance(ex, (ClientError, NoCredentialsError)):
             try:
                 handle_boto_error(ex)
             except ClientError as e:
