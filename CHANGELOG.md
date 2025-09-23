@@ -2,6 +2,31 @@
 
 <!-- version list -->
 
+## v1.2.1 (2025-09-23)
+
+### Bug Fixes
+
+- Explain NoCredentialsError
+  ([`2d35df3`](https://github.com/strongio/strong-opx/commit/2d35df3ff07c607af7bc277fb62705d4dc7a4f30))
+
+### Chores
+
+- Add manual version for strong-opx action
+  ([`aac780a`](https://github.com/strongio/strong-opx/commit/aac780a196480b8409abcbfd4640507f1475f932))
+
+- Install latest strong-opx only if no version is requested
+  ([`e018429`](https://github.com/strongio/strong-opx/commit/e0184290dfd655b79267df837ba9edf1d49e0ff6))
+
+- Install strong-opx from PyPI ([#2](https://github.com/strongio/strong-opx/pull/2),
+  [`4eb4de9`](https://github.com/strongio/strong-opx/commit/4eb4de9349cbafe42ffcd938d30affe8fb926acf))
+
+- Update project meta [skip ci]
+  ([`1dc50f3`](https://github.com/strongio/strong-opx/commit/1dc50f37c9107a78d786bea17016bb32952c9e20))
+
+- Use Python 3.12 in GA
+  ([`a498b88`](https://github.com/strongio/strong-opx/commit/a498b88cb936d5bc99f765c80b3da17a455b39d8))
+
+
 ## v1.2.0 (2025-09-19)
 
 ### Chores
