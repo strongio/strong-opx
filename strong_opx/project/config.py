@@ -19,7 +19,7 @@ class ProjectConfig(BaseModel):
     strong_opx: StrongOpxConfig = None
     helm: HelmConfig = None
 
-    secret: SecretProvider
+    secret: SecretProvider = SecretProvider()
     vars: VariableConfig
 
     @classmethod

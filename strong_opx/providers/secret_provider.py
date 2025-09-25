@@ -22,7 +22,7 @@ class SecretProvider:
         return "".join(random.choice(string.ascii_letters + string.digits) for _ in range(self.secret_length))
 
     def get_secret(self, environment: "Environment") -> str:
-        raise NotImplementedError()
+        raise NotImplementedError("Current Provider does not implement secret management")
 
     @classmethod
     def validate_provider_name(cls, value: str) -> str:
