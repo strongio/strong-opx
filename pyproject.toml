@@ -60,7 +60,7 @@ gcloud = [
     "google-cloud-artifact-registry"
 ]
 standard = [
-    "strong-opx[aws,azure]",
+    "strong-opx[aws,azure,gcloud]",
 ]
 
 [project.scripts]
