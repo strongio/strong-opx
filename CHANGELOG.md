@@ -2,6 +2,38 @@
 
 <!-- version list -->
 
+## v1.3.0 (2025-09-26)
+
+### Bug Fixes
+
+- `secret` in Project Config is Optional
+  ([`4e036fd`](https://github.com/strongio/strong-opx/commit/4e036fd89c84bb6573928a93b60195505a9e3bc8))
+
+- Improve Pydantic error message if value is missing
+  ([`ec311d2`](https://github.com/strongio/strong-opx/commit/ec311d2c56b29941e94ce1393641cbaa6d4a8722))
+
+### Chores
+
+- Add provider var to action ([#4](https://github.com/strongio/strong-opx/pull/4),
+  [`16b1f16`](https://github.com/strongio/strong-opx/commit/16b1f16e8344a9b32c9d8756d5fda0e55fe07be8))
+
+- Move publishing to PyPI to separate GA workflow
+  ([`10c4e88`](https://github.com/strongio/strong-opx/commit/10c4e882e2d1cff70f3f9cdd8e6f2cfd2605481d))
+
+- Tag requires write permission
+  ([`96eca5e`](https://github.com/strongio/strong-opx/commit/96eca5e63ef52c5d71662f4e7e54a80f00c6ffcb))
+
+### Features
+
+- Support of Google Cloud
+  ([`e740f27`](https://github.com/strongio/strong-opx/commit/e740f272b1654159b5617a31b99b29a50157bf39))
+
+### Refactoring
+
+- Rename ContainerRegistry to DockerRegistry
+  ([`040fac8`](https://github.com/strongio/strong-opx/commit/040fac81811c7e0c836a21046c248b5f4fc62a8c))
+
+
 ## v1.2.1 (2025-09-23)
 
 ### Bug Fixes
