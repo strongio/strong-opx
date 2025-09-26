@@ -14,7 +14,7 @@ are:
   Ansible playbooks.
 - **Kubernetes Cluster Operations**: Interact with Kubernetes clusters using `kubectl` and manage applications using
   Helm charts, without the need to manually manage kubeconfig files.
-- **Container Image Building**: Build Docker images for deployment, with support for auto-tagging.
+- **Docker Image Building**: Build Docker images for deployment, with support for auto-tagging.
 - **Variable & Secret Management**: Store variables and secrets securely inside Git repo.
 
 Each provider may implement a subset of these features depending on its capabilities.
@@ -28,21 +28,22 @@ Currently, strong-opx supports the following cloud providers:
 
    aws
    azure
+   gcloud
 
 Feature Matrix
 --------------
 The table below summarizes which features are available for each provider:
 
-+---------------------------------+-----+-------+
-| Feature                         | AWS | Azure |
-+=================================+=====+=======+
-| Compute Instance Management     | Yes |  No   |
-+---------------------------------+-----+-------+
-| Kubernetes Cluster Operations   | Yes |  No   |
-+---------------------------------+-----+-------+
-| Container Image Building        | Yes |  No   |
-+---------------------------------+-----+-------+
-| Variable & Secret Management    | Yes | Yes   |
-+---------------------------------+-----+-------+
++---------------------------------+-----+-------+--------------+
+| Feature                         | AWS | Azure | Google Cloud |
++=================================+=====+=======+==============+
+| Compute Instance Management     | Yes |  No   | No           |
++---------------------------------+-----+-------+--------------+
+| Kubernetes Cluster Operations   | Yes |  No   | No           |
++---------------------------------+-----+-------+--------------+
+| Docker Image Building           | Yes |  No   | Yes          |
++---------------------------------+-----+-------+--------------+
+| Variable & Secret Management    | Yes | Yes   | No           |
++---------------------------------+-----+-------+--------------+
 
 Refer to the provider-specific documentation for more details on usage and configuration.

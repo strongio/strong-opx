@@ -51,7 +51,7 @@ Provider
 
 A **Provider** in Strong-OpX represents an integration with a cloud platform, such as AWS or Azure. Providers are
 responsible for enabling Strong-OpX to manage resources and perform operations on these platforms. Each provider
-exposes a set of features, such as compute instance management, Kubernetes and Helm operations, container image
+exposes a set of features, such as compute instance management, Kubernetes and Helm operations, docker image
 building, and secret management. The specific features available depend on the provider.
 
 One project can utilize only one provider. To choose a provider for your project, you need to specify it in the

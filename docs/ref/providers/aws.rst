@@ -2,7 +2,7 @@ AWS Provider
 ============
 
 The AWS provider enables Strong-OpX to manage resources on Amazon Web Services. It supports all core features,
-including compute instance management, Kubernetes cluster operations (with kubectl and Helm), container image
+including compute instance management, Kubernetes cluster operations (with kubectl and Helm), docker image
 building (with auto-tagging), and variable/secret management.
 
 Configuration
