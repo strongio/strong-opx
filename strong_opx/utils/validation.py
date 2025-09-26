@@ -5,6 +5,10 @@ from pydantic import ValidationError
 from strong_opx.exceptions import ErrorDetail, YAMLError
 from strong_opx.utils.tracking import Position, get_position
 
+ERROR_MESSAGE_BY_TYPE = {
+    "missing": "Missing required field",
+}
+
 
 def get_position_by_path(
     input_values: dict, path: tuple
@@ -30,10 +34,17 @@ def translate_pydantic_errors(input_values: dict, ex: ValidationError) -> Except
     translated = []
 
     for error in ex.errors():
-        file_name, start_offset, end_offset = get_position_by_path(input_values, error["loc"])
+        file_name = get_position(input_values)[0]
+        _, start_offset, end_offset = get_position_by_path(input_values, error["loc"])
+        message = ERROR_MESSAGE_BY_TYPE.get(error["type"], error["msg"])
+
+        if start_offset is None:
+            loc = " > ".join(error["loc"])
+            message = f"{loc}: {message}"
+
         translated.append(
             ErrorDetail(
-                error=error["msg"],
+                error=message,
                 file_path=file_name,
                 start_pos=start_offset,
                 end_pos=end_offset,
