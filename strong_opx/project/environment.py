@@ -9,6 +9,7 @@ from strong_opx import yaml
 from strong_opx.exceptions import ProjectEnvironmentError
 from strong_opx.platforms import ALL_PLATFORMS, TPlatform
 from strong_opx.project.context_hooks import EnvironHook, ProjectContextHook
+from strong_opx.providers import current_docker_registry
 from strong_opx.template import Context
 from strong_opx.utils.validation import translate_pydantic_errors
 
@@ -51,6 +52,7 @@ class Environment:
     def create_context(self) -> Context:
         context = Context(self.vars)
         context["ENVIRONMENT"] = self.name
+        context["DOCKER_REGISTRY"] = current_docker_registry(self)
 
         for hook in self.get_context_hooks():
             hook(context)

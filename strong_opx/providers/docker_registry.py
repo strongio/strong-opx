@@ -1,6 +1,6 @@
 import logging
 import re
-from typing import TYPE_CHECKING, Any, Generator, Optional
+from typing import TYPE_CHECKING, Generator, Optional
 
 from strong_opx.exceptions import RepositoryNotFoundException
 from strong_opx.providers.discovery import current_provider_name
@@ -14,7 +14,7 @@ logger = logging.getLogger(__name__)
 DEFAULT_DOCKER_TAG = "latest"
 
 
-class AbstractContainerRegistry:
+class AbstractDockerRegistry:
     max_images_to_keep = 8
     revision_tag_re = re.compile(r"^(.+)-([0-9]+)(\.[a-z0-9]+)?$")
 
@@ -24,7 +24,7 @@ class AbstractContainerRegistry:
     def login(self):
         raise NotImplementedError()
 
-    def create_repository(self, repository_name: str) -> dict[str, Any]:
+    def create_repository(self, repository_name: str) -> str:
         raise NotImplementedError()
 
     def get_repository_uri(self, repository_name: str) -> Optional[str]:
@@ -34,7 +34,7 @@ class AbstractContainerRegistry:
         try:
             return self.get_repository_uri(repository_name)
         except RepositoryNotFoundException:
-            return self.create_repository(repository_name)["repositoryUri"]
+            return self.create_repository(repository_name)
 
     def revision_from_tag(self, tag: str) -> int:
         match = self.revision_tag_re.match(tag)
@@ -86,10 +86,10 @@ class AbstractContainerRegistry:
         return f"{repository_uri}:{latest_tag}"
 
 
-def current_container_registry(environment: "Environment") -> Optional[AbstractContainerRegistry]:
-    registry_class: Optional[type[AbstractContainerRegistry]] = import_module_attr_if_exists(
-        f"strong_opx.providers.{current_provider_name()}.container_registry",
-        "ContainerRegistry",
+def current_docker_registry(environment: "Environment") -> Optional[AbstractDockerRegistry]:
+    registry_class: Optional[type[AbstractDockerRegistry]] = import_module_attr_if_exists(
+        f"strong_opx.providers.{current_provider_name()}.docker_registry",
+        "DockerRegistry",
     )
     if registry_class:
         return registry_class(environment)

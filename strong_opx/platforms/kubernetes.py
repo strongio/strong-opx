@@ -1,3 +1,4 @@
+import logging
 import os
 import signal
 from functools import cached_property
@@ -13,7 +14,7 @@ from strong_opx.exceptions import CommandError
 from strong_opx.platforms.base import Platform
 from strong_opx.platforms.deployments import KubeCtlDeploymentProvider
 from strong_opx.platforms.plugins import KubernetesDashboardPlugin
-from strong_opx.providers import current_container_registry
+from strong_opx.providers import current_docker_registry
 from strong_opx.utils.shell import shell
 from strong_opx.utils.socket import get_free_tcp_port
 
@@ -40,7 +41,12 @@ class KubernetesPlatform(Platform):
     }
 
     def init_context(self, context: "Context") -> None:
-        context["images"] = current_container_registry(self.environment)
+        def images():
+            logging.warning("The 'images' context variable is deprecated, use 'DOCKER_REGISTRY' instead.")
+
+            return current_docker_registry(self.environment)
+
+        context["images"] = images
 
     @cached_property
     def kube_config_path(self) -> str:

@@ -8,7 +8,7 @@ import pytest
 
 from strong_opx.config.hierarchical import HierarchicalConfig
 from strong_opx.management.commands.docker_build import Command, get_ecr_tags_to_apply
-from strong_opx.providers.container_registry import AbstractContainerRegistry
+from strong_opx.providers.docker_registry import AbstractDockerRegistry
 from tests.mocks import create_mock_environment, create_mock_project
 
 
@@ -229,7 +229,7 @@ class CommandTests(TestCase):
 
     @patch.dict(os.environ, clear=True)
     @patch("strong_opx.management.commands.docker_build.shell", autospec=True)
-    @patch("strong_opx.providers.aws.container_registry.ContainerRegistry.login", autospec=True)
+    @patch("strong_opx.providers.aws.docker_registry.DockerRegistry.login", autospec=True)
     @patch("strong_opx.management.commands.docker_build.get_ecr_tags_to_apply", autospec=True)
     def test_handle_with_docker_push(self, get_ecr_tags_to_apply_mock: Mock, login_mock: Mock, shell_mock: Mock):
         get_ecr_tags_to_apply_mock.return_value = ("some-repo-url", {"some-repo-url:latest", "some-repo-url:some-tag"})
@@ -280,7 +280,7 @@ class CommandTests(TestCase):
             require_mock.assert_called_once_with("VAR1", "VAR2")
 
     def test_get_ecr_tags_to_apply(self):
-        mock_registry = MagicMock(spec=AbstractContainerRegistry)
+        mock_registry = MagicMock(spec=AbstractDockerRegistry)
         mock_registry.get_or_create_repository_uri.return_value = "some-repo-url"
         mock_registry.get_latest_revision.return_value = 1
         mock_registry.get_repository_uri.return_value = "some-repo-url"

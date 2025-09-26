@@ -7,7 +7,7 @@ from unittest import TestCase, mock
 import boto3
 from moto import mock_aws
 
-from strong_opx.providers.aws.container_registry import ContainerRegistry
+from strong_opx.providers.aws.docker_registry import DockerRegistry
 from strong_opx.providers.aws.errors import RepositoryNotFoundException
 from tests.mocks import create_mock_environment, create_mock_project
 
@@ -51,29 +51,28 @@ def _create_image_manifest():
 
 @mock_aws
 @mock.patch.dict(os.environ, {"AWS_DEFAULT_REGION": "us-east-1"})
-class ContainerRegistryTests(TestCase):
+class DockerRegistryTests(TestCase):
     def setUp(self) -> None:
         self.project = create_mock_project()
         self.environment = create_mock_environment(project=self.project)
 
     def test_create_repository_with_revisions(self):
-        repository = ContainerRegistry(self.environment).create_repository("unittest-image")
-        self.assertEqual(repository["imageTagMutability"], "MUTABLE")
-        self.assertEqual(repository["repositoryName"], "unittest-image")
+        repository_url = DockerRegistry(self.environment).create_repository("unittest-image")
+        self.assertEqual(repository_url, "123456789012.dkr.ecr.us-east-1.amazonaws.com/unittest-image")
 
     def test_get_repository_uri__not_found(self):
         with self.assertRaises(RepositoryNotFoundException):
-            ContainerRegistry(self.environment).get_repository_uri("unknown-repo")
+            DockerRegistry(self.environment).get_repository_uri("unknown-repo")
 
     def test_get_repository_uri__exists(self):
-        registry = ContainerRegistry(self.environment)
+        registry = DockerRegistry(self.environment)
         registry.create_repository("some-repo")
 
         uri = registry.get_repository_uri("some-repo")
         self.assertEqual(uri, "123456789012.dkr.ecr.us-east-1.amazonaws.com/some-repo")
 
     def test_iter_image_tags(self):
-        registry = ContainerRegistry(self.environment)
+        registry = DockerRegistry(self.environment)
         registry.create_repository("some-repo")
         boto3.client("ecr").put_image(
             repositoryName="some-repo",

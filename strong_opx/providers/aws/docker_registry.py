@@ -10,13 +10,13 @@ from strong_opx.project import Project
 from strong_opx.providers.aws.config import get_aws_config
 from strong_opx.providers.aws.errors import handle_boto_error
 from strong_opx.providers.aws.iam import get_current_account_id
-from strong_opx.providers.container_registry import AbstractContainerRegistry
+from strong_opx.providers.docker_registry import AbstractDockerRegistry
 from strong_opx.utils.shell import shell
 
 logger = logging.getLogger(__name__)
 
 
-class ContainerRegistry(AbstractContainerRegistry):
+class DockerRegistry(AbstractDockerRegistry):
     @cached_property
     def client(self):
         return boto3.client("ecr")
@@ -57,7 +57,8 @@ class ContainerRegistry(AbstractContainerRegistry):
                 }
             ),
         )
-        return response["repository"]
+
+        return response["repository"]["repositoryUri"]
 
     def get_repository_uri(self, repository_name: str) -> Optional[str]:
         try:

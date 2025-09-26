@@ -6,11 +6,7 @@ from typing import Any, Optional
 from strong_opx.exceptions import CommandError
 from strong_opx.management.command import ProjectCommand
 from strong_opx.project import Environment, Project
-from strong_opx.providers.container_registry import (
-    DEFAULT_DOCKER_TAG,
-    AbstractContainerRegistry,
-    current_container_registry,
-)
+from strong_opx.providers.docker_registry import DEFAULT_DOCKER_TAG, AbstractDockerRegistry, current_docker_registry
 from strong_opx.utils.shell import shell, ssh_agent
 
 logger = logging.getLogger(__name__)
@@ -25,7 +21,7 @@ def docker_tag_string(value: Optional[str]) -> str:
 
 
 def get_ecr_tags_to_apply(
-    registry: "AbstractContainerRegistry",
+    registry: "AbstractDockerRegistry",
     environment: "Environment",
     repository_name: str,
     docker_tag: list[str],
@@ -118,7 +114,7 @@ class Command(ProjectCommand):
         build_args: list[str] = None,
         **options: Any,
     ):
-        registry = current_container_registry(environment)
+        registry = current_docker_registry(environment)
         if registry is None:
             raise CommandError("No container registry configured for current provider")
 
