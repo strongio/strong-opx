@@ -93,3 +93,5 @@ def current_docker_registry(environment: "Environment") -> Optional[AbstractDock
     )
     if registry_class:
         return registry_class(environment)
+
+    return None

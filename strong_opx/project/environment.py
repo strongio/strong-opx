@@ -50,9 +50,10 @@ class Environment:
         )
 
     def create_context(self) -> Context:
-        context = Context(self.vars)
-        context["ENVIRONMENT"] = self.name
-        context["DOCKER_REGISTRY"] = current_docker_registry(self)
+        context = Context({
+            "ENVIRONMENT": self.name,
+            "DOCKER_REGISTRY": current_docker_registry(self)
+        })
 
         for hook in self.get_context_hooks():
             hook(context)
@@ -66,6 +67,7 @@ class Environment:
     @cached_property
     def context(self) -> Context:
         context = self.base_context.chain()
+        context.update(self.vars)
 
         var_paths = self.project.vars_config.get_paths(self)
         for file_path in var_paths:
