@@ -36,14 +36,16 @@ runs:
     - name: Extract version tag from action reference
       id: get-version
       run: |
-        if [ -z "${{ inputs.version }}" ]; then
+        if [ "${{ env.ACTION_REF }}" == "v*" ] && [ -z "${{ inputs.version }}" ]; then
           # Extract version from github.action_ref (e.g., v1.2 from strongio/strong-opx@v1.2)
-          VERSION=$(echo "${{ github.action_ref }}" | sed 's/^v//')
+          VERSION=$(echo "${{ env.ACTION_REF }}" | sed 's/^v//')
         else
           VERSION="${{ inputs.version }}"
         fi
         echo "version=$VERSION" >> $GITHUB_OUTPUT
       shell: bash
+      env:
+        ACTION_REF: ${{ github.action_ref }}
 
     - name: cache venv
       id: cache
@@ -67,7 +69,7 @@ runs:
       shell: bash
       run: |
         source /opt/strong-opx/bin/activate
-        if [ "${{ github.action_ref }}" = "master" ] && [ -z "${{ inputs.version }}" ]; then
+        if [ -z "${{ steps.get-version.outputs.version }}" ]; then
           pip install "strong-opx[${{ inputs.provider }}]"
         else
           pip install "strong-opx[${{ inputs.provider }}]==${{ steps.get-version.outputs.version }}"
