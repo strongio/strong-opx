@@ -27,7 +27,7 @@ dependencies = [
     "colorama",
     "filelock",
     "prompt-toolkit>=3.0.39",
-    "pydantic>=2",
+    "pydantic>=2.9",
     "tabulate",
 ]
 dynamic = ["version"]
