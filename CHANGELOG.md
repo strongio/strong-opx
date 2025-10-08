@@ -2,6 +2,31 @@
 
 <!-- version list -->
 
+## v1.3.1 (2025-10-08)
+
+### Bug Fixes
+
+- Don't include env vars in base context
+  ([`aefa61e`](https://github.com/strongio/strong-opx/commit/aefa61e86bee8313a3674017559b803f6dabe339))
+
+- Lint
+  ([`f58b5bf`](https://github.com/strongio/strong-opx/commit/f58b5bf77f5a4a96097aed39e5255a89442631f4))
+
+- Represent objects as string
+  ([`cab5f02`](https://github.com/strongio/strong-opx/commit/cab5f02f0906f18b07b26984758470a6b3b0279f))
+
+### Chores
+
+- Allow manual dispatch of publish workflow
+  ([`5ead25d`](https://github.com/strongio/strong-opx/commit/5ead25dc64d34a449325581c6f97f1b4bd890b32))
+
+- Fix version issues [skip ci]
+  ([`69c97e3`](https://github.com/strongio/strong-opx/commit/69c97e30bc1a9dbc6d3587ba102232ba50102087))
+
+- Upgrade pydantic requirement
+  ([`c5e92d5`](https://github.com/strongio/strong-opx/commit/c5e92d5fc12ecac7492793132e019d7299ead8ac))
+
+
 ## v1.3.0 (2025-09-26)
 
 ### Bug Fixes
