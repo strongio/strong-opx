@@ -230,7 +230,5 @@ class GenericPlatform(Platform):
     def ansible_extra_vars(self) -> Generator[str, None, None]:
         with tempfile.NamedTemporaryFile(mode="w+", suffix=".yml") as t:
             context = self.environment.context.as_dict()
-            # Remove 'images' key as it is non-picklable
-            context.pop("images", None)
             yaml.dump(context, t)
             yield t.name

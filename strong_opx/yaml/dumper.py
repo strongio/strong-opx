@@ -11,12 +11,16 @@ class OpxYAMLDumper(yaml.Dumper):
         # We don't want to use aliases in YAML, because they're not supported by all tools.
         return True
 
+    def represent_object(self, data):
+        return self.represent_str(str(data))
+
 
 OpxYAMLDumper.add_representer(OpxString, SafeRepresenter.represent_str)
 OpxYAMLDumper.add_representer(OpxInteger, SafeRepresenter.represent_int)
 OpxYAMLDumper.add_representer(OpxFloat, SafeRepresenter.represent_float)
 OpxYAMLDumper.add_representer(OpxSequence, SafeRepresenter.represent_list)
 OpxYAMLDumper.add_representer(OpxMapping, SafeRepresenter.represent_dict)
+OpxYAMLDumper.add_multi_representer(object, OpxYAMLDumper.represent_object)
 
 
 def dump_all(data: list[Any], target: Union[str, TextIO]) -> None:
