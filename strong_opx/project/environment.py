@@ -50,10 +50,12 @@ class Environment:
         )
 
     def create_context(self) -> Context:
-        context = Context({
-            "ENVIRONMENT": self.name,
-            "DOCKER_REGISTRY": current_docker_registry(self)
-        })
+        context = Context(
+            {
+                "ENVIRONMENT": self.name,
+                "DOCKER_REGISTRY": current_docker_registry(self),
+            }
+        )
 
         for hook in self.get_context_hooks():
             hook(context)
