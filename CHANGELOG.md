@@ -2,6 +2,19 @@
 
 <!-- version list -->
 
+## v1.4.0 (2025-10-14)
+
+### Bug Fixes
+
+- Improve terraform comment handling
+  ([`a131f41`](https://github.com/strongio/strong-opx/commit/a131f41df8ee574515e152f9208dd88b1924261b))
+
+### Features
+
+- Add support for selective vars decryption
+  ([`b95c7da`](https://github.com/strongio/strong-opx/commit/b95c7dadce5792b30d5d0e3de2bf8f4d58f68bf0))
+
+
 ## v1.3.1 (2025-10-08)
 
 ### Bug Fixes
