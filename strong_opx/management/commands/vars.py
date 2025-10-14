@@ -22,6 +22,7 @@ class Command(ProjectCommand):
         encrypt.set_defaults(operation="encrypt")
 
         decrypt = subparsers.add_parser("decrypt", help="Decrypt environment variables")
+        decrypt.add_argument("--vars", nargs="*", help="If specified, decrypt only these variables.")
         decrypt.set_defaults(operation="decrypt")
 
     def handle(self, operation=None, **options: Any) -> None:
@@ -51,5 +52,9 @@ class Command(ProjectCommand):
             raise CommandError("Either provide --value or --vars to encrypt")
 
     def handle_decrypt(self, environment: Environment, **options: Any):
-        decrypted_vars = environment.context
-        yaml.dump(decrypted_vars.as_dict(exclude_initial=True), sys.stdout)
+        context = environment.context
+        if options.get("vars"):
+            for var_name in options["vars"]:
+                print(f"{var_name}: {context[var_name]}")
+        else:
+            yaml.dump(context.as_dict(exclude_initial=True), sys.stdout)
