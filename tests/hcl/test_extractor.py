@@ -8,10 +8,17 @@ from strong_opx.utils.tracking import Position, get_position
 
 
 class FileReaderTests(TestCase):
-    def test_read_comment(self):
+    def test_discard_single_line_comment(self):
         s = StringIO('hello world\nvariable "hello"')
         reader = FileReader("some-file", s)
-        self.assertEqual("hello world", reader.read_comment())
+        reader.discard_single_line_comment()
+        self.assertEqual(s.read(), 'variable "hello"')
+
+    def test_discard_multi_line_comment(self):
+        s = StringIO('hello world\n another line */\nvariable "hello"')
+        reader = FileReader("some-file", s)
+        reader.discard_multi_line_comment()
+        self.assertEqual(s.read(), 'variable "hello"')
 
     def test_peak(self):
         s = StringIO("some content here")
@@ -49,7 +56,7 @@ class FileReaderTests(TestCase):
                 "before nested { nested braces } after nested }",  # trailing text excluded, because it is after }
             ),
             ("\n{ } }", "\n{ } }"),
-            ("\n 1 # something with {\n }", "\n 1 # something with {\n }"),
+            ("\n 1 # something with \n {\n }", "\n 1 \n {\n }"),
             ('\n "something with } or {" }', '\n "something with } or {" }'),
         ]
     )
@@ -72,6 +79,22 @@ class HCLVariableExtractorTests(TestCase):
         extractor.extract("some-file", s)
         self.assertSetEqual(extractor.required_vars, {"AWS_REGION"})
         self.assertSetEqual(extractor.optional_vars, set())
+
+    @parameterized.expand(
+        [
+            '// This is a comment\nvariable "var_name" {}',
+            '# This is a comment\nvariable "var_name" {}',
+            '/* This is a comment */\nvariable "var_name" {}',
+            'variable "var_name" { // This is a comment\n}',
+            'variable "var_name" { # This is a comment \n}',
+            'variable "var_name" { /* This is a comment */ }',
+        ]
+    )
+    def test_extract__preceding_comment(self, string):
+        extractor = HCLVariableExtractor()
+        extractor.extract("some-file", StringIO(string))
+
+        self.assertSetEqual(extractor.required_vars, {"var_name"})
 
     def test_extracted_vars_has_position_markers(self):
         s = StringIO('variable "AWS_REGION" {}')

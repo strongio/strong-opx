@@ -35,16 +35,39 @@ class FileReader:
         while self.peak(1).isspace():
             self.read(1)
 
-    def read_comment(self) -> str:
-        content = ""
+    def discard_comment(self, s) -> bool:
+        if s == "#":
+            self.discard_single_line_comment()
+            return True
+
+        if s == "/":
+            n = self.peak(1)
+
+            if n == "/":
+                self.discard_single_line_comment()
+                return True
+
+            if n == "*":
+                self.discard_multi_line_comment()
+                return True
+
+        return False
+
+    def discard_single_line_comment(self) -> None:
         while True:
             s = self.read(1)
             if not s or s == "\n":
                 break
 
-            content += s
+    def discard_multi_line_comment(self) -> None:
+        while True:
+            s = self.read(1)
+            if not s:
+                break
 
-        return content
+            if s == "*" and self.peak(1) == "/":
+                self.read(2)
+                break
 
     def read_string(self, end: str) -> str:
         content = ""
@@ -67,8 +90,7 @@ class FileReader:
             if not s:
                 break
 
-            if s == "#":
-                self.read_comment()
+            if self.discard_comment(s):
                 continue
 
             content += s
@@ -88,11 +110,11 @@ class FileReader:
             if not s:
                 break
 
-            content += s
-            if s == "#":
-                content += self.read_comment() + "\n"
+            if self.discard_comment(s):
+                content += "\n"
                 continue
 
+            content += s
             if s in "'\"":
                 content += self.read_string(s) + s
                 continue
