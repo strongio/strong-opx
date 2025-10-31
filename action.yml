@@ -47,15 +47,15 @@ runs:
       env:
         ACTION_REF: ${{ github.action_ref }}
 
-    - name: cache venv
-      id: cache
-      uses: actions/cache@v3
-      with:
-        path: /opt/strong-opx
-        key: "strong-opx-${{ steps.get-version.outputs.version }}"
+#    - name: cache venv
+#      id: cache
+#      uses: actions/cache@v3
+#      with:
+#        path: /opt/strong-opx
+#        key: "strong-opx-${{ steps.get-version.outputs.version }}"
 
     - name: create venv
-      if: steps.cache.outputs.cache-hit != 'true'
+#      if: steps.cache.outputs.cache-hit != 'true'
       shell: bash
       run: python -m venv /opt/strong-opx
 
