@@ -19,7 +19,7 @@ class HCLRunner:
         self.directory = directory
 
     @staticmethod
-    def _get_var_value(value: Any) -> str:
+    def _serialize_value(value: Any) -> str:
         """
         Converts a variable value to a string that can be used as an environment variable that will be passed to a
         Terraform or Packer command.
@@ -43,7 +43,7 @@ class HCLRunner:
                 if isinstance(item, str):
                     build_string += f'"{item}",'
                 else:
-                    build_string += f"{HCLRunner._get_var_value(item)},"
+                    build_string += f"{HCLRunner._serialize_value(item)},"
             if build_string.endswith(","):
                 build_string = build_string[:-1]  # remove trailing comma
             build_string += "]"
@@ -54,7 +54,7 @@ class HCLRunner:
                 if isinstance(val, str):
                     build_string += f'"{key}": "{val}",'
                 else:
-                    build_string += f'"{key}": {HCLRunner._get_var_value(val)},'
+                    build_string += f'"{key}": {HCLRunner._serialize_value(val)},'
             if build_string.endswith(","):
                 build_string = build_string[:-1]  # remove trailing comma
 
@@ -81,14 +81,14 @@ class HCLRunner:
                 missing_vars.append(var)
                 continue
 
-            env_dict[f"{self.env_var_prefix}_{var}"] = self._get_var_value(context[var])
+            env_dict[f"{self.env_var_prefix}_{var}"] = self._serialize_value(context[var])
 
         if missing_vars:
             raise UndefinedVariableError(*missing_vars)
 
         for var in extractor.optional_vars:
             if var in context:
-                env_dict[f"{self.env_var_prefix}_{var}"] = self._get_var_value(context[var])
+                env_dict[f"{self.env_var_prefix}_{var}"] = self._serialize_value(context[var])
 
         return env_dict
 
