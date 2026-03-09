@@ -2,6 +2,24 @@
 
 <!-- version list -->
 
+## v1.4.1 (2026-03-09)
+
+### Bug Fixes
+
+- Build strings for complex types differently for Terraform/Packer commands
+  ([#5](https://github.com/strongio/strong-opx/pull/5),
+  [`906ee4e`](https://github.com/strongio/strong-opx/commit/906ee4e0b1d50ffc932c71877170958923e606bd))
+
+- **terraform,packer,cli**: Build strings for lists and dicts differently
+  ([#5](https://github.com/strongio/strong-opx/pull/5),
+  [`906ee4e`](https://github.com/strongio/strong-opx/commit/906ee4e0b1d50ffc932c71877170958923e606bd))
+
+### Chores
+
+- Skip caching inside github actions [skip ci]
+  ([`75e77a3`](https://github.com/strongio/strong-opx/commit/75e77a351cb4e626c579abe27865c7390ed6b6f1))
+
+
 ## v1.4.0 (2025-10-14)
 
 ### Bug Fixes
