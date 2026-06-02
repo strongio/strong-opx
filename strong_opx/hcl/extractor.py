@@ -91,6 +91,7 @@ class FileReader:
                 break
 
             if self.discard_comment(s):
+                self.discard_whitespaces()
                 continue
 
             content += s
