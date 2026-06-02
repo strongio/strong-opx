@@ -2,6 +2,31 @@
 
 <!-- version list -->
 
+## v1.4.2 (2026-06-02)
+
+### Bug Fixes
+
+- Discard empty lines after comment
+  ([`8fcffd1`](https://github.com/onesixsolutions/strong-opx/commit/8fcffd17a9e64068d3a719cf19b54cbb2ee1c509))
+
+- Pass boolean as lower case string to Terraform
+  ([`b504254`](https://github.com/onesixsolutions/strong-opx/commit/b504254e056267f1143b46e96cd2beadc1e9f4b1))
+
+### Chores
+
+- Document how project/environment is resolved [skip ci]
+  ([`6351abd`](https://github.com/onesixsolutions/strong-opx/commit/6351abd988899fe4e35185bf560af5076566a356))
+
+- Expand claude skill [skip ci]
+  ([`cd149cf`](https://github.com/onesixsolutions/strong-opx/commit/cd149cf7941be51ba534b54b0da2afc9cc8541f1))
+
+- Expand vars [skip ci]
+  ([`4d2508d`](https://github.com/onesixsolutions/strong-opx/commit/4d2508d4ec5b5606b62dc94364e91734153ef866))
+
+- Restructure skill for plugin usage
+  ([`fc96cdf`](https://github.com/onesixsolutions/strong-opx/commit/fc96cdf44001a0657b1ac7c69b897581da5b0883))
+
+
 ## v1.4.1 (2026-03-09)
 
 ### Bug Fixes
